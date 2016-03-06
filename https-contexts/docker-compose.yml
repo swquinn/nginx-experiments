@@ -24,18 +24,38 @@
 
 #version: '2.0'
 #services:
+
+#: Build the Nginx base image that will be used for launching individual
+#: server instamces for the components (e.g. app.acme.com, www.acme.com) as
+#: well as the reverse proxy server.
 nginx:
-  #image: http/nginx
-  build: ./devops/nginx
-  volumes_from:
-    - acme_app:ro
-    - acme_www:ro
+  build: ./nginx
+
+#: The reverse proxy Nginx server links
+reverse_proxy:
+  image: nginx
+  links:
+    - nginx_acme_app
+    - nginx_acme_www
   ports:
     - '80:80'
     - '443:443'
+
+nginx_acme_app:
+  image: httpscontexts_nginx
+  ports:
+    - '8079:80'
+  volumes_from:
+    - acme_app:ro
+
+nginx_acme_www:
+  image: httpscontexts_nginx
+  ports:
+    - '8080:80'
+  volumes_from:
+    - acme_www:ro
+
 acme_app:
-  #image: http/acme
   build: ./acme.com-app
 acme_www:
-  #image: http/acme
   build: ./acme.com-www

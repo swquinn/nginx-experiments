@@ -88,8 +88,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #: Provision the bare-metal box.
   config.vm.provider :virtualbox do |vb|
     vb.gui = false
-    vb.customize ["modifyvm", :id, "--cpus", "2"]
-    vb.customize ["modifyvm", :id, "--memory", "2048"]
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
   end
 
   config.vm.provision :shell, path: "initctl.sh"
