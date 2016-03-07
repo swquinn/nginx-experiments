@@ -40,6 +40,13 @@ RUN apt-get -y install supervisor && \
 ADD files/etc/supervisor/conf.d/memcached.conf /etc/supervisor/conf.d/memcached.conf
 ADD files/etc/supervisor/conf.d/nginx.conf /etc/supervisor/conf.d/nginx.conf
 
+ADD files/etc/nginx/site-apps /etc/nginx/site-apps
+ADD files/etc/nginx/sites-available /etc/nginx/sites-available
+
+#: Remove the existing default configuration
+RUN sudo rm /etc/nginx/sites-available/default
+RUN sudo rm /etc/nginx/sites-enabled/default
+
 #: Configure Nginx:
 #:
 #:   1. Modify the user under which nginx runs from "nginx" to "www-data"
@@ -64,10 +71,10 @@ RUN sed -i 's/^user\s*nginx;$/user www-data;/' /etc/nginx/nginx.conf && \
 #: container is "perfected"
 RUN apt-get -y install nano git
 
+VOLUME /var/log/nginx
+
 # Define working directory.
 WORKDIR /var/www
-
-VOLUME /var/log/nginx
 
 # Expose ports.
 EXPOSE 22

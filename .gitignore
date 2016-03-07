@@ -1,4 +1,5 @@
 # Files and directories
 .git
 .vagrant
+temp
 vagrant.json
