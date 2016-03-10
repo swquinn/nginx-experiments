@@ -39,8 +39,8 @@ reverse_proxy:
     - '80:80'
     - '443:443'
   links:
-    - nginx_acme_app:app
-    - nginx_acme_www:www
+    - nginx_acme_app:nginx_acme_app
+    - nginx_acme_www:nginx_acme_www
   volumes:
     - /var/log/nginx/acme.com:/var/log/nginx
 
