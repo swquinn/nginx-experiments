@@ -19,15 +19,21 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
+FROM ubuntu:trusty
+MAINTAINER "Sean Quinn <sean.quinn@extesla.com>"
 
-# TODO: Currently only Docker 1.10.x and above supports version 2.0 manifests.
+RUN mkdir -p /var/www/acme.com
+ADD . /var/www/acme.com
 
-nginx:
-  build: ./nginx
-  volumes_from:
-    - acme:ro
-  ports:
-    - '80:80'
-    - '443:443'
-acme:
-  build: ./acme.com
+RUN mkdir -p /etc/nginx/sites-available
+ADD conf/etc/nginx/sites-available /etc/nginx/sites-available
+
+#: Identify the volumes in this container that we will want to import into
+#: another container when we use the "volume-from" directive. In this case
+#: we're mounting the web directory and the sites-available directory into
+#: another container.
+VOLUME /etc/nginx/sites-available
+VOLUME /var/www/acme.com
+
+# Define working directory.
+WORKDIR /var/www/acme.com
