@@ -22,20 +22,46 @@
 
 # TODO: Currently only Docker 1.10.x and above supports version 2.0 manifests.
 
-#version: '2.0'
-#services:
+#: Build the Nginx base image that will be used for launching individual
+#: server instamces for the components (e.g. app.acme.com, www.acme.com) as
+#: well as the reverse proxy server.
 nginx:
-  #image: http/nginx
-  build: ./devops/nginx
-  volumes_from:
-    - acme_app:ro
-    - acme_www:ro
+  build: ./nginx
+
+#: The reverse proxy Nginx server links
+proxy:
+  build: ./proxy
+  hostname: acme.com
   ports:
     - '80:80'
     - '443:443'
+  links:
+    - nginx_acme_app:nginx_acme_app
+    - nginx_acme_www:nginx_acme_www
+  volumes:
+    - /var/log/nginx/acme.com:/var/log/nginx
+
+nginx_acme_app:
+  image: httpssubdomains_nginx
+  hostname: app.acme.com
+  ports:
+    - '8079:8079'
+  volumes:
+    - /var/log/nginx/app.acme.com:/var/log/nginx
+  volumes_from:
+    - acme_app:ro
+
+nginx_acme_www:
+  image: httpssubdomains_nginx
+  hostname: www.acme.com
+  ports:
+    - '8080:8080'
+  volumes:
+    - /var/log/nginx/www.acme.com:/var/log/nginx
+  volumes_from:
+    - acme_www:ro
+
 acme_app:
-  #image: http/acme
   build: ./acme.com-app
 acme_www:
-  #image: http/acme
   build: ./acme.com-www

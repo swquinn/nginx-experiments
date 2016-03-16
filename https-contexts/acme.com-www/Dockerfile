@@ -26,6 +26,7 @@ RUN mkdir -p /var/www/acme.com
 ADD . /var/www/acme.com-www
 
 RUN mkdir -p /etc/nginx/sites-available
+ADD conf/etc/nginx/site-apps /etc/nginx/site-apps
 ADD conf/etc/nginx/sites-available/default.conf /etc/nginx/sites-available/acme.com-www/acme-www.conf
 
 #: Identify the volumes in this container that we will want to import into

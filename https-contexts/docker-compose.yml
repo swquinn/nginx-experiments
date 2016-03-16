@@ -22,9 +22,6 @@
 
 # TODO: Currently only Docker 1.10.x and above supports version 2.0 manifests.
 
-#version: '2.0'
-#services:
-
 #: Build the Nginx base image that will be used for launching individual
 #: server instamces for the components (e.g. app.acme.com, www.acme.com) as
 #: well as the reverse proxy server.

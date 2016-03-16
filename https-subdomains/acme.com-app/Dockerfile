@@ -25,13 +25,17 @@ MAINTAINER "Sean Quinn <sean.quinn@extesla.com>"
 RUN mkdir -p /var/www/acme.com
 ADD . /var/www/acme.com-app
 
+RUN mkdir -p /etc/nginx/sites-apps
 RUN mkdir -p /etc/nginx/sites-available
+
+ADD conf/etc/nginx/site-apps /etc/nginx/site-apps
 ADD conf/etc/nginx/sites-available/default.conf /etc/nginx/sites-available/acme.com-app/acme-app.conf
 
 #: Identify the volumes in this container that we will want to import into
 #: another container when we use the "volume-from" directive. In this case
 #: we're mounting the web directory and the sites-available directory into
 #: another container.
+VOLUME /etc/nginx/site-apps
 VOLUME /etc/nginx/sites-available/acme.com-app
 VOLUME /var/www/acme.com-app
 
