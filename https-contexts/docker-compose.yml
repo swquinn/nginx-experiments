@@ -20,48 +20,70 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-# TODO: Currently only Docker 1.10.x and above supports version 2.0 manifests.
+# The MIT License (MIT)
+#
+# Copyright (c) 2016 Sean Quinn
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
 
-#: Build the Nginx base image that will be used for launching individual
-#: server instamces for the components (e.g. app.acme.com, www.acme.com) as
-#: well as the reverse proxy server.
-nginx:
-  build: ./nginx
+version: '2'
 
-#: The reverse proxy Nginx server links
-reverse_proxy:
-  build: ./acme.com-proxy
-  hostname: acme.com
-  ports:
-    - '80:80'
-    - '443:443'
-  links:
-    - nginx_acme_app:nginx_acme_app
-    - nginx_acme_www:nginx_acme_www
-  volumes:
-    - /var/log/nginx/acme.com:/var/log/nginx
+services:
 
-nginx_acme_app:
-  image: httpscontexts_nginx
-  hostname: app.acme.com
-  ports:
-    - '8079:8079'
-  volumes:
-    - /var/log/nginx/app.acme.com:/var/log/nginx
-  volumes_from:
-    - acme_app:ro
+  proxy:
+    build: ./acme.com-proxy
+    image: https-contexts/acme
+    container_name: https_contexts_acme_proxy
+    hostname: acme.com
+    ports:
+      - '80:80'
+      - '443:443'
+    links:
+      - acme_app_server:nginx_acme_app
+      - acme_www_server:nginx_acme_www
 
-nginx_acme_www:
-  image: httpscontexts_nginx
-  hostname: www.acme.com
-  ports:
-    - '8080:8080'
-  volumes:
-    - /var/log/nginx/www.acme.com:/var/log/nginx
-  volumes_from:
-    - acme_www:ro
+  acme_app_server:
+    build: ./nginx
+    image: https-contexts/acme-app-server
+    container_name: https_contexts_acme_app_server
+    hostname: app.acme.com
+    ports:
+      - '8079:8079'
+    volumes_from:
+      - acme_app_data:ro
 
-acme_app:
-  build: ./acme.com-app
-acme_www:
-  build: ./acme.com-www
+  acme_www_server:
+    build: ./nginx
+    image: https-contexts/acme-www-server
+    container_name: https_contexts_acme_www_server
+    hostname: www.acme.com
+    ports:
+      - '8080:8080'
+    volumes_from:
+      - acme_www_data:ro
+
+  acme_app_data:
+    build: ./acme.com-app
+    image: https-contexts/acme-app-data
+    container_name: https_contexts_acme_app_data
+
+  acme_www_data:
+    build: ./acme.com-www
+    image: https-contexts/acme-www-data
+    container_name: https_contexts_acme_www_data

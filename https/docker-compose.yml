@@ -20,14 +20,21 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-# TODO: Currently only Docker 1.10.x and above supports version 2.0 manifests.
+version: '2'
 
-nginx:
-  build: ./nginx
-  volumes_from:
-    - acme:ro
-  ports:
-    - '80:80'
-    - '443:443'
-acme:
-  build: ./acme.com
+services:
+
+  https_acme_server:
+    build: ./nginx
+    image: https/acme-server
+    container_name: https_acme_server
+    volumes_from:
+      - https_acme_data:ro
+    ports:
+      - '80:80'
+      - '443:443'
+
+  https_acme_data:
+    build: ./acme.com
+    image: https/acme-data
+    container_name: https_acme_data
