@@ -19,25 +19,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
-FROM ubuntu:trusty
+FROM extesla/alpine
 MAINTAINER "Sean Quinn <sean.quinn@extesla.com>"
 
-RUN mkdir -p /var/www/acme.com
-ADD . /var/www/acme.com-app
-
-RUN mkdir -p /etc/nginx/sites-apps
-RUN mkdir -p /etc/nginx/sites-available
-
-ADD conf/etc/nginx/site-apps /etc/nginx/site-apps
-ADD conf/etc/nginx/sites-available/default.conf /etc/nginx/sites-available/acme.com-app/acme-app.conf
+COPY . /srv/www/app.acme.com
+COPY conf/etc/nginx/sites /etc/nginx/sites
+COPY conf/etc/nginx/sites-available/default.conf /etc/nginx/sites-available/www.acme.com
 
 #: Identify the volumes in this container that we will want to import into
 #: another container when we use the "volume-from" directive. In this case
 #: we're mounting the web directory and the sites-available directory into
 #: another container.
-VOLUME /etc/nginx/site-apps
-VOLUME /etc/nginx/sites-available/acme.com-app
-VOLUME /var/www/acme.com-app
+VOLUME /etc/nginx/sites
+VOLUME /etc/nginx/sites-available
+VOLUME /srv/www/app.acme.com
 
 # Define working directory.
-WORKDIR /var/www/acme.com-app
+WORKDIR /srv/www/app.acme.com
+
+CMD ["echo", "app.acme.com"]

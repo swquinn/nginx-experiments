@@ -20,48 +20,48 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-# TODO: Currently only Docker 1.10.x and above supports version 2.0 manifests.
+version: '2'
 
-#: Build the Nginx base image that will be used for launching individual
-#: server instamces for the components (e.g. app.acme.com, www.acme.com) as
-#: well as the reverse proxy server.
-nginx:
-  build: ./nginx
+services:
 
-#: The reverse proxy Nginx server links
-proxy:
-  build: ./proxy
-  hostname: acme.com
-  ports:
-    - '80:80'
-    - '443:443'
-  links:
-    - nginx_acme_app:nginx_acme_app
-    - nginx_acme_www:nginx_acme_www
-  volumes:
-    - /var/log/nginx/acme.com:/var/log/nginx
+  proxy:
+    build: ./proxy
+    image: https-subdomains/acme
+    container_name: https_subdomains_acme_proxy
+    hostname: acme.com
+    ports:
+      - '80:80'
+      - '443:443'
+    links:
+      - acme_app_server:nginx_acme_app
+      - acme_www_server:nginx_acme_www
 
-nginx_acme_app:
-  image: httpssubdomains_nginx
-  hostname: app.acme.com
-  ports:
-    - '8079:8079'
-  volumes:
-    - /var/log/nginx/app.acme.com:/var/log/nginx
-  volumes_from:
-    - acme_app:ro
+  acme_app_server:
+    build: ./nginx
+    image: https-subdomains/acme-app-server
+    container_name: https_subdomains_acme_app_server
+    hostname: app.acme.com
+    ports:
+      - '8079:8079'
+    volumes_from:
+      - acme_app_data:ro
 
-nginx_acme_www:
-  image: httpssubdomains_nginx
-  hostname: www.acme.com
-  ports:
-    - '8080:8080'
-  volumes:
-    - /var/log/nginx/www.acme.com:/var/log/nginx
-  volumes_from:
-    - acme_www:ro
+  acme_www_server:
+    build: ./nginx
+    image: https-subdomains/acme-www-server
+    container_name: https_subdomains_acme_www_server
+    hostname: www.acme.com
+    ports:
+      - '8080:8080'
+    volumes_from:
+      - acme_www_data:ro
 
-acme_app:
-  build: ./acme.com-app
-acme_www:
-  build: ./acme.com-www
+  acme_app_data:
+    build: ./acme.com-app
+    image: https-subdomains/acme-app-data
+    container_name: https_subdomains_acme_app_data
+
+  acme_www_data:
+    build: ./acme.com-www
+    image: https-subdomains/acme-www-data
+    container_name: https_subdomains_acme_www_data
